@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  body {
+    font-family:'DM Sans',sans-serif;
+    background:#efeff4;
+    min-height:100vh;
+  }
+
+  /* ── TOP NAV ── */
+  .navbar {
+    position:sticky; top:0; z-index:50;
+    background:#fff;
+    height:44px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 16px;
+    border-bottom:0.5px solid #c8c8cc;
+  }
+  .navbar-title { font-size:17px; font-weight:700; color:#000; letter-spacing:-0.3px; }
+  .saldo-pill {
+    display:flex; align-items:center; gap:6px;
+    background:#f0fdf4;
+    border:1px solid #86efac;
+    border-radius:20px;
+    padding:4px 12px 4px 8px;
+  }
+  .saldo-num { font-size:13px; font-weight:700; color:#16a34a; font-variant-numeric:tabular-nums; }
+
+  /* ── TABS ── */
+  .tabs {
+    position:sticky; top:44px; z-index:40;
+    background:#fff;
+    display:flex;
+    border-bottom:0.5px solid #c8c8cc;
+    overflow-x:auto; scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar { display:none; }
+  .tab {
+    flex-shrink:0;
+    padding:10px 18px;
+    font-size:14px; font-weight:500; color:#8a8a8e;
+    cursor:pointer; position:relative;
+    white-space:nowrap;
+    transition:color 0.15s;
+  }
+  .tab.active { color:#000; font-weight:700; }
+  .tab.active::after {
+    content:''; position:absolute; bottom:0; left:16px; right:16px;
+    height:2px; background:#fe2c55; border-radius:2px 2px 0 0;
+  }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size:12px; font-weight:400; color:#6d6d72;
+    text-transform:uppercase; letter-spacing:0.5px;
+    padding:18px 16px 7px;
+  }
+
+  /* ── VIDEO ROW CARD ── */
+  .card {
+    background:#fff;
+    border-top:0.5px solid #c8c8cc;
+    border-bottom:0.5px solid #c8c8cc;
+    margin-bottom:0;
+  }
+
+  .video-row {
+    display:flex; align-items:center;
+    padding:11px 16px;
+    position:relative;
+    cursor:pointer;
+    transition:background 0.1s;
+    min-height:72px;
+  }
+  .video-row:active { background:#f5f5f5; }
+  .video-row + .video-row::before {
+    content:''; position:absolute; top:0; left:76px; right:0;
+    height:0.5px; background:#c8c8cc;
+  }
+
+  /* thumbnail */
+  .thumb {
+    width:54px; height:54px; border-radius:8px;
+    overflow:hidden; flex-shrink:0; margin-right:12px;
+    position:relative;
+  }
+  .thumb canvas { width:54px; height:54px; display:block; }
+  .thumb-play {
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .thumb-play svg { filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5)); }
+
+  /* row text */
+  .row-body { flex:1; min-width:0; }
+  .row-title { font-size:14px; font-weight:500; color:#000; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .row-meta  { font-size:12px; color:#8a8a8e; margin-top:3px; display:flex; align-items:center; gap:6px; }
+  .row-views { display:flex; align-items:center; gap:3px; }
+
+  /* ── HEART BUTTON ── */
+  .heart-wrap {
+    position:relative;
+    display:flex; flex-direction:column; align-items:center;
+    gap:2px; margin-left:10px; flex-shrink:0;
+    width:44px;
+  }
+  .heart-btn {
+    width:40px; height:40px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; user-select:none;
+    transition:transform 0.15s;
+  }
+  .heart-btn:active { transform:scale(0.85); }
+
+  .heart-svg { width:26px; height:26px; display:block; }
+  .h-fill   { fill:transparent; transition:fill 0.22s; }
+  .h-stroke { stroke:#c7c7cc; stroke-width:1.8; fill:none; transition:stroke 0.22s; }
+
+  .heart-btn.liked .h-fill   { fill:#fe2c55; }
+  .heart-btn.liked .h-stroke { stroke:#fe2c55; }
+
+  @keyframes hpop {
+    0%  { transform:scale(1); }
+    35% { transform:scale(1.55); }
+    60% { transform:scale(0.88); }
+    80% { transform:scale(1.15); }
+    100%{ transform:scale(1); }
+  }
+  .heart-btn.pop { animation:hpop 0.38s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+
+  /* floating +num */
+  .earn-pop {
+    position:absolute;
+    top:-4px; left:50%; transform:translateX(-50%);
+    font-size:15px; font-weight:700; color:#16a34a;
+    white-space:nowrap; pointer-events:none;
+    animation:earnFloat 1.8s ease forwards;
+    text-shadow:0 1px 3px rgba(0,0,0,0.08);
+  }
+  @keyframes earnFloat {
+    0%  { opacity:0; transform:translateX(-50%) translateY(0) scale(0.7); }
+    15% { opacity:1; transform:translateX(-50%) translateY(-4px) scale(1.1); }
+    60% { opacity:1; transform:translateX(-50%) translateY(-28px) scale(1); }
+    100%{ opacity:0; transform:translateX(-50%) translateY(-42px) scale(0.9); }
+  }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position:fixed; bottom:0; left:0; right:0; height:60px;
+    background:#fff; border-top:0.5px solid #c8c8cc;
+    display:flex; align-items:center; justify-content:space-around;
+    z-index:50; padding-bottom:2px;
+  }
+  .nav-item {
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    color:#8a8a8e; font-size:10px; font-weight:500; cursor:pointer; padding:4px 10px;
+  }
+  .nav-item.active { color:#fe2c55; }
+  .nav-item svg { width:24px; height:24px; }
+  .nav-plus-wrap {
+    width:48px; height:32px; border-radius:8px;
+    background:#fe2c55;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .scroll-pad { height:70px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="navbar">
+  <div class="navbar-title">Dashboard</div>
+  <div class="saldo-pill">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="6" width="20" height="13" rx="2"/>
+      <circle cx="12" cy="12" r="2.5"/>
+      <path d="M6 12h.01M18 12h.01"/>
+    </svg>
+    <span class="saldo-num" id="saldo-display">2.503,33</span>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs" id="tabs"></div>
+
+<!-- FEED -->
+<div id="feed"></div>
+<div class="scroll-pad"></div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    <span>Home</span>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <span>Zoeken</span>
+  </div>
+  <div class="nav-item">
+    <div class="nav-plus-wrap">
+      <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span>Inbox</span>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Profiel</span>
+  </div>
+</div>
+
+<script>
+const categories = [
+  { label: 'Voor jou',   key: 'forjou' },
+  { label: 'Trending',   key: 'trending' },
+  { label: 'Natuur',     key: 'natuur' },
+  { label: 'Koken',      key: 'koken' },
+  { label: 'Dans',       key: 'dans' },
+  { label: 'Reizen',     key: 'reizen' },
+  { label: 'Sport',      key: 'sport' },
+];
+
+const allVideos = [
+  // Voor jou
+  { cat:'forjou', title:'Zonsondergang in de Alpen', user:'sophievdberg', views:'1,2M', dur:'0:58', draw: drawSunset },
+  { cat:'forjou', title:'Pizza in 10 minuten maken', user:'tim.creates',  views:'890K',  dur:'1:14', draw: drawPizza },
+  { cat:'forjou', title:'Amsterdam bij nacht', user:'noor.nl', views:'540K', dur:'0:42', draw: drawAmsterdam },
+  { cat:'forjou', title:'Stroopwafel cheesecake recept', user:'bakedbylisa', views:'2,1M', dur:'2:05', draw: drawCake },
+  { cat:'forjou', title:'Goedkoop vliegtickets boeken', user:'maxreizen', views:'330K', dur:'1:30', draw: drawSky },
+  { cat:'forjou', title:'Danschallenge 🔥', user:'dansfan99', views:'4,8M', dur:'0:33', draw: drawDance },
+  // Trending
+  { cat:'trending', title:'Viral Belgische frieten hack', user:'friet_king', views:'6,2M', dur:'0:45', draw: drawPizza },
+  { cat:'trending', title:'Polaire beer zwemt mee', user:'wildlens', views:'9,1M', dur:'1:02', draw: drawSky },
+  { cat:'trending', title:'Café in Gent – skjult plek', user:'wanderbe', views:'1,8M', dur:'0:55', draw: drawAmsterdam },
+  { cat:'trending', title:'Perfecte croissant thuis bakken', user:'bakedbylisa', views:'3,3M', dur:'1:48', draw: drawCake },
+  // Natuur
+  { cat:'natuur', title:'Waterval in Noorwegen', user:'nordexplore', views:'2,4M', dur:'1:10', draw: drawSunset },
+  { cat:'natuur', title:'Vogelzang in de Ardennen', user:'naturebe', views:'780K', dur:'2:20', draw: drawSky },
+  { cat:'natuur', title:'Zeeschildpad in Griekenland', user:'sea_tales', views:'1,1M', dur:'0:52', draw: drawAmsterdam },
+  { cat:'natuur', title:'Zonsopgang Sahara', user:'desertvibes', views:'3,6M', dur:'1:05', draw: drawSunset },
+  // Koken
+  { cat:'koken', title:'Carbonara zoals in Rome', user:'pasta.papa', views:'5,5M', dur:'2:10', draw: drawPizza },
+  { cat:'koken', title:'Klassieke Vlaamse stoverij', user:'vlaamskoken', views:'890K', dur:'3:15', draw: drawCake },
+  { cat:'koken', title:'Smoothiebowl in 5 min', user:'healthnoor', views:'420K', dur:'0:58', draw: drawSky },
+  // Dans
+  { cat:'dans', title:'Nieuwe challenge – doe je mee?', user:'dansfan99', views:'7,3M', dur:'0:28', draw: drawDance },
+  { cat:'dans', title:'Salsa tutorial voor beginners', user:'salsalife', views:'1,2M', dur:'4:00', draw: drawDance },
+  { cat:'dans', title:'Spontaan dansen in Antwerpen', user:'streetsbe', views:'560K', dur:'0:44', draw: drawAmsterdam },
+  // Reizen
+  { cat:'reizen', title:'24u in Lissabon – wat te doen', user:'maxreizen', views:'2,0M', dur:'3:30', draw: drawSky },
+  { cat:'reizen', title:'Goedkope hostels tip 2025', user:'budgettrip', views:'890K', dur:'1:55', draw: drawAmsterdam },
+  { cat:'reizen', title:'Marokko in 7 dagen', user:'wanderworld', views:'1,4M', dur:'2:45', draw: drawSunset },
+  // Sport
+  { cat:'sport', title:'Ochtend workout – geen gym', user:'fitjelle', views:'3,1M', dur:'1:20', draw: drawDance },
+  { cat:'sport', title:'Zwemmen in ijskoud water', user:'coldpoolnl', views:'4,7M', dur:'0:50', draw: drawSky },
+  { cat:'sport', title:'Fietsen door de Ardennen', user:'velobe', views:'670K', dur:'2:10', draw: drawSunset },
+  { cat:'sport', title:'30 min hardlopen beginners', user:'runwithme', views:'1,9M', dur:'2:35', draw: drawForest },
+  { cat:'sport', title:'Yoga op het strand – ochtendroutine', user:'yoganoor', views:'2,2M', dur:'3:10', draw: drawBeach },
+  { cat:'sport', title:'Krachttraining thuis met stoel', user:'fitjelle', views:'880K', dur:'1:45', draw: drawDance },
+  { cat:'sport', title:'Skaten in Rotterdam centrum', user:'skate.nl', views:'1,3M', dur:'0:56', draw: drawAmsterdam },
+  // Voor jou – extra
+  { cat:'forjou', title:'Katten die mensen grappig maken 😂', user:'catlovers.nl', views:'8,4M', dur:'0:22', draw: drawForest },
+  { cat:'forjou', title:'Tiny house tour in Utrecht', user:'kleinwonen', views:'1,6M', dur:'2:40', draw: drawAmsterdam },
+  { cat:'forjou', title:'10 dingen die je nooit meer koopt', user:'spaargids', views:'3,0M', dur:'1:55', draw: drawSky },
+  { cat:'forjou', title:'Herfst wandeling in de Veluwe', user:'veluwewandel', views:'490K', dur:'1:12', draw: drawForest },
+  // Trending – extra
+  { cat:'trending', title:'Dit recept gaat viral in NL', user:'kooktrend', views:'11,2M', dur:'1:00', draw: drawPizza },
+  { cat:'trending', title:'TikTok ban – wat nu?', user:'techpraat', views:'5,7M', dur:'2:15', draw: drawSky },
+  { cat:'trending', title:'Mooiste stranden van Europa 2025', user:'beachlife', views:'4,1M', dur:'1:30', draw: drawBeach },
+  { cat:'trending', title:'Gratis geld verdienen met apps?', user:'moneycheck', views:'7,8M', dur:'1:10', draw: drawAmsterdam },
+  // Natuur – extra
+  { cat:'natuur', title:'Vosjes in de sneeuw – Zweden', user:'nordic.wild', views:'5,2M', dur:'0:48', draw: drawForest },
+  { cat:'natuur', title:'Koraalrif snorkelen Kroatië', user:'sea_tales', views:'2,9M', dur:'1:35', draw: drawBeach },
+  { cat:'natuur', title:'Onweer boven de Noordzee', user:'stormchaser.be', views:'3,4M', dur:'0:38', draw: drawSky },
+  { cat:'natuur', title:"Magnolia's in bloei \u2013 Gent", user:'naturebe', views:'670K', dur:'1:02', draw: drawForest },
+  // Koken – extra
+  { cat:'koken', title:'Thaise curry in 20 minuten', user:'spicekitchen', views:'1,4M', dur:'2:30', draw: drawPizza },
+  { cat:'koken', title:'Zelf sourdough brood bakken', user:'bakedbylisa', views:'3,8M', dur:'4:20', draw: drawCake },
+  { cat:'koken', title:'Perfecte scrambled eggs zoals Gordon', user:'chefvibes', views:'6,1M', dur:'0:55', draw: drawPizza },
+  { cat:'koken', title:'Vegan bitterballen recept', user:'veganbe', views:'920K', dur:'1:50', draw: drawCake },
+  { cat:'koken', title:'Paella op de BBQ – zomer hit', user:'bbqking.nl', views:'2,5M', dur:'3:05', draw: drawBeach },
+  // Dans – extra
+  { cat:'dans', title:'Afrobeats tutorial – makkelijk', user:'dancewithme', views:'2,8M', dur:'2:15', draw: drawDance },
+  { cat:'dans', title:'Bruiloftsdans oefenen thuis', user:'salsalife', views:'1,5M', dur:'3:40', draw: drawDance },
+  { cat:'dans', title:'Breakdance basismoves 2025', user:'b_boy_nl', views:'990K', dur:'1:58', draw: drawDance },
+  // Reizen – extra
+  { cat:'reizen', title:'Weekend Barcelona – tips & tricks', user:'maxreizen', views:'3,2M', dur:'2:50', draw: drawBeach },
+  { cat:'reizen', title:'Treinreis door Scandinavië', user:'trainaddict', views:'1,1M', dur:'4:00', draw: drawForest },
+  { cat:'reizen', title:'Campervakantie Nederland – kosten', user:'budgettrip', views:'740K', dur:'2:20', draw: drawSky },
+  { cat:'reizen', title:'Beste streetfood in Bangkok', user:'wanderworld', views:'4,5M', dur:'1:40', draw: drawPizza },
+  { cat:'reizen', title:'Solo reizen als vrouw – veilig?', user:'soloqueens', views:'2,3M', dur:'3:15', draw: drawAmsterdam },
+];
+
+// ── Canvas draw functions ──────────────────────────────────────
+function drawSunset(c){
+  const cx=c.getContext('2d'),w=c.width,h=c.height;
+  const sky=cx.createLinearGradient(0,0,0,h);
+  sky.addColorStop(0,'#1a0020');sky.addColorStop(0.5,'#7c1a4a');sky.addColorStop(1,'#f97316');
+  cx.fillStyle=sky;cx.fillRect(0,0,w,h);
+  const sg=cx.createRadialGradient(w*.5,h*.55,0,w*.5,h*.55,w*.35);
+  sg.addColorStop(0,'rgba(255,240,100,0.9)');sg.addColorStop(1,'transparent');
+  cx.fillStyle=sg;cx.fillRect(0,0,w,h);
+  cx.fillStyle='#1e0535';
+  cx.beginPath();cx.moveTo(0,h*.8);cx.lineTo(w*.25,h*.45);cx.lineTo(w*.5,h*.65);cx.lineTo(w*.75,h*.38);cx.lineTo(w,h*.7);cx.lineTo(w,h);cx.lineTo(0,h);cx.closePath();cx.fill();
+}
+function drawPizza(c){
+  const cx=c.getContext('2d'),w=c.width,h=c.height;
+  cx.fillStyle='#1c0a00';cx.fillRect(0,0,w,h);
+  for(let i=0;i<6;i++){cx.fillStyle=`hsl(25,${40+i*3}%,${16+i*2}%)`;cx.fillRect(0,i*(h/6),w,h/6+1);}
+  cx.save();cx.translate(w/2,h/2);
+  cx.beginPath();cx.arc(0,0,w*.42,0,Math.PI*2);cx.fillStyle='#92400e';cx.fill();
+  cx.beginPath();cx.arc(0,0,w*.32,0,Math.PI*2);cx.fillStyle='#c2410c';cx.fill();
+  cx.beginPath();cx.arc(0,0,w*.26,0,Math.PI*2);cx.fillStyle='#fde68a';cx.fill();
+  [[0,0],[-.15,.1],[.18,.05],[-.05,-.18],[.1,.18]].forEach(([dx,dy])=>{
+    cx.beginPath();cx.arc(dx*w,dy*w,w*.07,0,Math.PI*2);cx.fillStyle='#7f1d1d';cx.fill();
+  });
+  cx.restore();
+}
+function drawAmsterdam(c){
+  const cx=c.getContext('2d'),w=c.width,h=c.height;
+  const sky=cx.createLinearGradient(0,0,0,h*.55);
+  sky.addColorStop(0,'#020617');sky.addColorStop(1,'#0f172a');
+  cx.fillStyle=sky;cx.fillRect(0,0,w,h);
+  for(let i=0;i<40;i++){cx.beginPath();cx.arc(Math.random()*w,Math.random()*h*.45,Math.random()*1.2,0,Math.PI*2);cx.fillStyle=`rgba(255,255,255,${.3+Math.random()*.7})`;cx.fill();}
+  const cols=['#1e293b','#0f172a','#1e3a5f','#172554'];
+  cols.forEach((col,i)=>{
+    const hw=w/4,hh=h*(.18+i*.05),hx=i*hw,hy=h*.55-hh;
+    cx.fillStyle=col;cx.fillRect(hx,hy,hw-1,hh+h*.05);
+    cx.beginPath();cx.moveTo(hx-2,hy);cx.lineTo(hx+hw/2,hy-h*.07);cx.lineTo(hx+hw+2,hy);cx.closePath();cx.fillStyle='#0c1526';cx.fill();
+    for(let r=0;r<2;r++)for(let cl=0;cl<2;cl++){cx.fillStyle=Math.random()>.3?'#fbbf24':'#1e293b';cx.fillRect(hx+hw*.15+cl*(hw*.45),hy+hh*.2+r*(hh*.35),hw*.2,hh*.2);}
+  });
+  const water=cx.createLinearGradient(0,h*.55,0,h);
+  water.addColorStop(0,'#0c1a3a');water.addColorStop(1,'#020617');
+  cx.fillStyle=water;cx.fillRect(0,h*.55,w,h*.45);
+  [[w*.25,'#fbbf24'],[w*.65,'#60a5fa']].forEach(([x,col])=>{
+    const rg=cx.createLinearGradient(x,h*.55,x,h);rg.addColorStop(0,col+'99');rg.addColorStop(1,'transparent');
+    cx.fillStyle=rg;cx.fillRect(x-6,h*.55,12,h*.45);
+  });
+}
+function drawCake(c){
+  const cx=c.getContext('2d'),w=c.width,h=c.height;
+  cx.fillStyle='#f8f5f0';cx.fillRect(0,0,w,h);
+  for(let i=0;i<10;i++){cx.beginPath();cx.strokeStyle=`rgba(180,160,140,${.04+Math.random()*.06})`;cx.lineWidth=Math.random()*6+2;cx.moveTo(Math.random()*w,0);cx.lineTo(Math.random()*w,h);cx.stroke();}
+  cx.save();cx.translate(w/2,h/2);
+  cx.beginPath();cx.arc(0,0,w*.42,0,Math.PI*2);cx.fillStyle='#fff';cx.fill();
+  cx.beginPath();cx.arc(0,0,w*.34,0,Math.PI*2);cx.fillStyle='#fef3c7';cx.fill();
+  cx.strokeStyle='#d97706';cx.lineWidth=3;cx.lineCap='round';
+  for(let i=0;i<4;i++){const a=i*(Math.PI*2/4);cx.beginPath();cx.moveTo(Math.cos(a)*w*.1,Math.sin(a)*w*.1);cx.bezierCurveTo(Math.cos(a+.5)*w*.25,Math.sin(a+.5)*w*.25,Math.cos(a+.8)*w*.28,Math.sin(a+.8)*w*.28,Math.cos(a+1.2)*w*.32,Math.sin(a+1.2)*w*.32);cx.stroke();}
+  [[-.15,-.08],[.12,.12],[-.08,.18]].forEach(([dx,dy])=>{cx.beginPath();cx.arc(dx*w,dy*w,w*.05,0,Math.PI*2);cx.fillStyle='#dc2626';cx.fill();});
+  cx.restore();
+}
+function drawSky(c){
+  const cx=c.getContext('2d'),w=c.width,h=c.height;
+  const sky=cx.createLinearGradient(0,0,0,h);
+  sky.addColorStop(0,'#0369a1');sky.addColorStop(.5,'#0ea5e9');sky.addColorStop(1,'#bae6fd');
+  cx.fillStyle=sky;cx.fillRect(0,0,w,h);
+  const sg=cx.createRadialGradient(w*.75,h*.1,0,w*.75,h*.1,w*.3);
+  sg.addColorStop(0,'rgba(255,251,235,.9)');sg.addColorStop(1,'transparent');
+  cx.fillStyle=sg;cx.fillRect(0,0,w,h);
+  function cloud(x,y,s){cx.save();cx.translate(x,y);cx.scale(s,s);cx.fillStyle='rgba(255,255,255,0.9)';[[0,0,28],[30,-6,22],[58,0,26],[-18,8,18],[78,8,20]].forEach(([dx,dy,r])=>{cx.beginPath();cx.arc(dx,dy,r,0,Math.PI*2);cx.fill();});cx.restore();}
+  cloud(w*.0,h*.3,.8);cloud(w*.38,h*.48,1.1);cloud(w*.65,h*.22,.9);
+}
+function drawDance(c){
+  const cx=c.getContext('2d'),w=c.width,h=c.height;
+  cx.fillStyle='#09000f';cx.fillRect(0,0,w,h);
+  const floor=cx.createLinearGradient(0,h*.55,0,h);floor.addColorStop(0,'#1a0033');floor.addColorStop(1,'#000');
+  cx.fillStyle=floor;cx.fillRect(0,h*.55,w,h*.45);
+  [['#ff00ff',.2],['#00ffff',.5],['#ff3366',.8]].forEach(([col,x])=>{
+    cx.save();cx.globalAlpha=.15;const lg=cx.createLinearGradient(w*x,0,w*x+(w*.1),h*.55);
+    lg.addColorStop(0,col);lg.addColorStop(1,'transparent');cx.fillStyle=lg;
+    cx.beginPath();cx.moveTo(w*x,0);cx.lineTo(w*x-w*.1,h*.55);cx.lineTo(w*x+w*.1,h*.55);cx.closePath();cx.fill();cx.restore();
+  });
+  cx.save();cx.translate(w*.5,h*.55);cx.fillStyle='#1a0033';
+  cx.beginPath();cx.ellipse(0,-h*.12,w*.07,h*.13,0,0,Math.PI*2);cx.fill();
+  cx.beginPath();cx.arc(0,-h*.27,w*.06,0,Math.PI*2);cx.fill();
+  cx.strokeStyle='#1a0033';cx.lineWidth=w*.06;cx.lineCap='round';
+  cx.beginPath();cx.moveTo(0,-h*.18);cx.lineTo(-w*.18,-h*.06);cx.stroke();
+  cx.beginPath();cx.moveTo(0,-h*.18);cx.lineTo(w*.14,-h*.28);cx.stroke();
+  cx.beginPath();cx.moveTo(0,0);cx.lineTo(-w*.1,h*.14);cx.stroke();
+  cx.beginPath();cx.moveTo(0,0);cx.lineTo(w*.08,h*.16);cx.stroke();
+  cx.restore();
+  cx.save();cx.globalAlpha=.3;const halo=cx.createRadialGradient(w*.5,h*.35,0,w*.5,h*.35,w*.28);
+  halo.addColorStop(0,'#e879f9');halo.addColorStop(1,'transparent');cx.fillStyle=halo;cx.fillRect(0,0,w,h);cx.restore();
+}
+
+function drawForest(c){
+  const cx=c.getContext('2d'),w=c.width,h=c.height;
+  const sky=cx.createLinearGradient(0,0,0,h*.5);
+  sky.addColorStop(0,'#064e3b');sky.addColorStop(1,'#065f46');
+  cx.fillStyle=sky;cx.fillRect(0,0,w,h);
+  cx.fillStyle='#022c22';cx.fillRect(0,h*.5,w,h*.5);
+  function tree(x,bh){
+    cx.save();cx.translate(x,h*.55);
+    for(let i=0;i<3;i++){const s=1-i*.22,ty=-bh*(.3+i*.28),tw=w*(.22-i*.04);cx.beginPath();cx.moveTo(0,ty);cx.lineTo(-tw*s,ty+bh*.25);cx.lineTo(tw*s,ty+bh*.25);cx.closePath();cx.fillStyle=`hsl(150,${30+i*5}%,${10+i*3}%)`;cx.fill();}
+    cx.restore();
+  }
+  [.08,.22,.38,.55,.7,.85,.95].forEach((x,i)=>tree(w*x,h*(.38+((i%3)*.06))));
+  const fog=cx.createLinearGradient(0,h*.45,0,h*.65);fog.addColorStop(0,'transparent');fog.addColorStop(.5,'rgba(200,230,210,0.08)');fog.addColorStop(1,'transparent');
+  cx.fillStyle=fog;cx.fillRect(0,0,w,h);
+}
+function drawBeach(c){
+  const cx=c.getContext('2d'),w=c.width,h=c.height;
+  const sky=cx.createLinearGradient(0,0,0,h*.55);
+  sky.addColorStop(0,'#0c4a6e');sky.addColorStop(.6,'#0ea5e9');sky.addColorStop(1,'#7dd3fc');
+  cx.fillStyle=sky;cx.fillRect(0,0,w,h);
+  const sun=cx.createRadialGradient(w*.75,h*.18,0,w*.75,h*.18,w*.18);
+  sun.addColorStop(0,'rgba(255,236,153,1)');sun.addColorStop(.4,'rgba(251,191,36,.8)');sun.addColorStop(1,'transparent');
+  cx.fillStyle=sun;cx.fillRect(0,0,w,h);
+  const sea=cx.createLinearGradient(0,h*.5,0,h*.72);
+  sea.addColorStop(0,'#0284c7');sea.addColorStop(1,'#0369a1');
+  cx.fillStyle=sea;cx.fillRect(0,h*.5,w,h*.22);
+  for(let i=0;i<4;i++){cx.strokeStyle=`rgba(255,255,255,${.12+i*.04})`;cx.lineWidth=2;cx.beginPath();cx.moveTo(0,h*(.52+i*.03));cx.bezierCurveTo(w*.3,h*(.5+i*.03),w*.6,h*(.54+i*.03),w,h*(.52+i*.03));cx.stroke();}
+  const sand=cx.createLinearGradient(0,h*.72,0,h);
+  sand.addColorStop(0,'#fcd34d');sand.addColorStop(1,'#d97706');
+  cx.fillStyle=sand;cx.fillRect(0,h*.72,w,h*.28);
+}
+
+// ── Build UI ──────────────────────────────────────────────────
+let saldo = 2503.33;
+const liked = new Set();
+
+function formatSaldo(n){ return n.toLocaleString('nl-NL',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+const heartSVG = `<svg class="heart-svg" viewBox="0 0 24 24">
+  <path class="h-fill" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+  <path class="h-stroke" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+</svg>`;
+
+// Build tabs
+const tabsEl = document.getElementById('tabs');
+categories.forEach((cat, i) => {
+  const t = document.createElement('div');
+  t.className = 'tab' + (i===0?' active':'');
+  t.textContent = cat.label;
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    renderFeed(cat.key);
+  });
+  tabsEl.appendChild(t);
+});
+
+let videoId = 0;
+
+function renderFeed(catKey) {
+  const feed = document.getElementById('feed');
+  feed.innerHTML = '';
+
+  const vids = allVideos.filter(v => v.cat === catKey);
+
+  // Group into sections of ~3-4
+  const sections = [
+    { label: 'Vandaag', items: vids.slice(0, Math.ceil(vids.length/2)) },
+    { label: 'Eerder bekeken', items: vids.slice(Math.ceil(vids.length/2)) },
+  ].filter(s => s.items.length > 0);
+
+  sections.forEach(sec => {
+    const label = document.createElement('div');
+    label.className = 'section-label';
+    label.textContent = sec.label;
+    feed.appendChild(label);
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    feed.appendChild(card);
+
+    sec.items.forEach((v, rowIdx) => {
+      const id = videoId++;
+      const row = document.createElement('div');
+      row.className = 'video-row';
+      row.innerHTML = `
+        <div class="thumb">
+          <canvas width="54" height="54" data-draw="${id}"></canvas>
+          <div class="thumb-play">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="12" fill="rgba(0,0,0,0.35)"/>
+              <polygon points="10,8 18,12 10,16" fill="white"/>
+            </svg>
+          </div>
+        </div>
+        <div class="row-body">
+          <div class="row-title">${v.title}</div>
+          <div class="row-meta">
+            <span>@${v.user}</span>
+            <span>·</span>
+            <span class="row-views">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8a8a8e" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              ${v.views}
+            </span>
+            <span>·</span>
+            <span>${v.dur}</span>
+          </div>
+        </div>
+        <div class="heart-wrap">
+          <div class="heart-btn" data-id="${id}">${heartSVG}</div>
+        </div>`;
+      card.appendChild(row);
+
+      // draw thumbnail
+      requestAnimationFrame(() => {
+        const canvas = row.querySelector(`canvas[data-draw="${id}"]`);
+        if (canvas) v.draw(canvas);
+      });
+
+      // heart tap
+      const heartBtn = row.querySelector('.heart-btn');
+      heartBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (liked.has(id)) return;
+        liked.add(id);
+        heartBtn.classList.add('liked', 'pop');
+        heartBtn.addEventListener('animationend', () => heartBtn.classList.remove('pop'), { once: true });
+
+        const amount = (Math.random() * 3.8 + 0.6);
+        const rounded = Math.round(amount * 100) / 100;
+        saldo += rounded;
+        document.getElementById('saldo-display').textContent = formatSaldo(saldo);
+
+        const pop = document.createElement('div');
+        pop.className = 'earn-pop';
+        pop.textContent = '+' + rounded.toFixed(2).replace('.', ',');
+        heartBtn.parentElement.appendChild(pop);
+        setTimeout(() => pop.remove(), 1900);
+      });
+    });
+  });
+}
+
+renderFeed('forjou');
+</script>
+</body>
+</html>
