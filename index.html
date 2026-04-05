@@ -196,7 +196,7 @@
   </div>
   <div class="nav-item">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-    <span>Zoeken</span>
+    <span>Search</span>
   </div>
   <div class="nav-item">
     <div class="nav-plus-wrap">
@@ -209,7 +209,7 @@
   </div>
   <div class="nav-item">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    <span>Profiel</span>
+    <span>Profile</span>
   </div>
 </div>
 
@@ -226,74 +226,86 @@ const categories = [
 
 const allVideos = [
   // Voor jou
-  { cat:'forjou', title:'Zonsondergang in de Alpen', user:'sophievdberg', views:'1,2M', dur:'0:58', draw: drawSunset },
-  { cat:'forjou', title:'Pizza in 10 minuten maken', user:'tim.creates',  views:'890K',  dur:'1:14', draw: drawPizza },
-  { cat:'forjou', title:'Amsterdam bij nacht', user:'noor.nl', views:'540K', dur:'0:42', draw: drawAmsterdam },
-  { cat:'forjou', title:'Stroopwafel cheesecake recept', user:'bakedbylisa', views:'2,1M', dur:'2:05', draw: drawCake },
-  { cat:'forjou', title:'Goedkoop vliegtickets boeken', user:'maxreizen', views:'330K', dur:'1:30', draw: drawSky },
-  { cat:'forjou', title:'Danschallenge 🔥', user:'dansfan99', views:'4,8M', dur:'0:33', draw: drawDance },
-  // Trending
-  { cat:'trending', title:'Viral Belgische frieten hack', user:'friet_king', views:'6,2M', dur:'0:45', draw: drawPizza },
-  { cat:'trending', title:'Polaire beer zwemt mee', user:'wildlens', views:'9,1M', dur:'1:02', draw: drawSky },
-  { cat:'trending', title:'Café in Gent – skjult plek', user:'wanderbe', views:'1,8M', dur:'0:55', draw: drawAmsterdam },
-  { cat:'trending', title:'Perfecte croissant thuis bakken', user:'bakedbylisa', views:'3,3M', dur:'1:48', draw: drawCake },
-  // Natuur
-  { cat:'natuur', title:'Waterval in Noorwegen', user:'nordexplore', views:'2,4M', dur:'1:10', draw: drawSunset },
-  { cat:'natuur', title:'Vogelzang in de Ardennen', user:'naturebe', views:'780K', dur:'2:20', draw: drawSky },
-  { cat:'natuur', title:'Zeeschildpad in Griekenland', user:'sea_tales', views:'1,1M', dur:'0:52', draw: drawAmsterdam },
-  { cat:'natuur', title:'Zonsopgang Sahara', user:'desertvibes', views:'3,6M', dur:'1:05', draw: drawSunset },
-  // Koken
-  { cat:'koken', title:'Carbonara zoals in Rome', user:'pasta.papa', views:'5,5M', dur:'2:10', draw: drawPizza },
-  { cat:'koken', title:'Klassieke Vlaamse stoverij', user:'vlaamskoken', views:'890K', dur:'3:15', draw: drawCake },
-  { cat:'koken', title:'Smoothiebowl in 5 min', user:'healthnoor', views:'420K', dur:'0:58', draw: drawSky },
-  // Dans
-  { cat:'dans', title:'Nieuwe challenge – doe je mee?', user:'dansfan99', views:'7,3M', dur:'0:28', draw: drawDance },
-  { cat:'dans', title:'Salsa tutorial voor beginners', user:'salsalife', views:'1,2M', dur:'4:00', draw: drawDance },
-  { cat:'dans', title:'Spontaan dansen in Antwerpen', user:'streetsbe', views:'560K', dur:'0:44', draw: drawAmsterdam },
-  // Reizen
-  { cat:'reizen', title:'24u in Lissabon – wat te doen', user:'maxreizen', views:'2,0M', dur:'3:30', draw: drawSky },
-  { cat:'reizen', title:'Goedkope hostels tip 2025', user:'budgettrip', views:'890K', dur:'1:55', draw: drawAmsterdam },
-  { cat:'reizen', title:'Marokko in 7 dagen', user:'wanderworld', views:'1,4M', dur:'2:45', draw: drawSunset },
-  // Sport
-  { cat:'sport', title:'Ochtend workout – geen gym', user:'fitjelle', views:'3,1M', dur:'1:20', draw: drawDance },
-  { cat:'sport', title:'Zwemmen in ijskoud water', user:'coldpoolnl', views:'4,7M', dur:'0:50', draw: drawSky },
-  { cat:'sport', title:'Fietsen door de Ardennen', user:'velobe', views:'670K', dur:'2:10', draw: drawSunset },
-  { cat:'sport', title:'30 min hardlopen beginners', user:'runwithme', views:'1,9M', dur:'2:35', draw: drawForest },
-  { cat:'sport', title:'Yoga op het strand – ochtendroutine', user:'yoganoor', views:'2,2M', dur:'3:10', draw: drawBeach },
-  { cat:'sport', title:'Krachttraining thuis met stoel', user:'fitjelle', views:'880K', dur:'1:45', draw: drawDance },
-  { cat:'sport', title:'Skaten in Rotterdam centrum', user:'skate.nl', views:'1,3M', dur:'0:56', draw: drawAmsterdam },
-  // Voor jou – extra
-  { cat:'forjou', title:'Katten die mensen grappig maken 😂', user:'catlovers.nl', views:'8,4M', dur:'0:22', draw: drawForest },
-  { cat:'forjou', title:'Tiny house tour in Utrecht', user:'kleinwonen', views:'1,6M', dur:'2:40', draw: drawAmsterdam },
-  { cat:'forjou', title:'10 dingen die je nooit meer koopt', user:'spaargids', views:'3,0M', dur:'1:55', draw: drawSky },
-  { cat:'forjou', title:'Herfst wandeling in de Veluwe', user:'veluwewandel', views:'490K', dur:'1:12', draw: drawForest },
-  // Trending – extra
-  { cat:'trending', title:'Dit recept gaat viral in NL', user:'kooktrend', views:'11,2M', dur:'1:00', draw: drawPizza },
-  { cat:'trending', title:'TikTok ban – wat nu?', user:'techpraat', views:'5,7M', dur:'2:15', draw: drawSky },
-  { cat:'trending', title:'Mooiste stranden van Europa 2025', user:'beachlife', views:'4,1M', dur:'1:30', draw: drawBeach },
-  { cat:'trending', title:'Gratis geld verdienen met apps?', user:'moneycheck', views:'7,8M', dur:'1:10', draw: drawAmsterdam },
-  // Natuur – extra
-  { cat:'natuur', title:'Vosjes in de sneeuw – Zweden', user:'nordic.wild', views:'5,2M', dur:'0:48', draw: drawForest },
-  { cat:'natuur', title:'Koraalrif snorkelen Kroatië', user:'sea_tales', views:'2,9M', dur:'1:35', draw: drawBeach },
-  { cat:'natuur', title:'Onweer boven de Noordzee', user:'stormchaser.be', views:'3,4M', dur:'0:38', draw: drawSky },
-  { cat:'natuur', title:"Magnolia's in bloei \u2013 Gent", user:'naturebe', views:'670K', dur:'1:02', draw: drawForest },
-  // Koken – extra
-  { cat:'koken', title:'Thaise curry in 20 minuten', user:'spicekitchen', views:'1,4M', dur:'2:30', draw: drawPizza },
-  { cat:'koken', title:'Zelf sourdough brood bakken', user:'bakedbylisa', views:'3,8M', dur:'4:20', draw: drawCake },
-  { cat:'koken', title:'Perfecte scrambled eggs zoals Gordon', user:'chefvibes', views:'6,1M', dur:'0:55', draw: drawPizza },
-  { cat:'koken', title:'Vegan bitterballen recept', user:'veganbe', views:'920K', dur:'1:50', draw: drawCake },
-  { cat:'koken', title:'Paella op de BBQ – zomer hit', user:'bbqking.nl', views:'2,5M', dur:'3:05', draw: drawBeach },
-  // Dans – extra
-  { cat:'dans', title:'Afrobeats tutorial – makkelijk', user:'dancewithme', views:'2,8M', dur:'2:15', draw: drawDance },
-  { cat:'dans', title:'Bruiloftsdans oefenen thuis', user:'salsalife', views:'1,5M', dur:'3:40', draw: drawDance },
-  { cat:'dans', title:'Breakdance basismoves 2025', user:'b_boy_nl', views:'990K', dur:'1:58', draw: drawDance },
-  // Reizen – extra
-  { cat:'reizen', title:'Weekend Barcelona – tips & tricks', user:'maxreizen', views:'3,2M', dur:'2:50', draw: drawBeach },
-  { cat:'reizen', title:'Treinreis door Scandinavië', user:'trainaddict', views:'1,1M', dur:'4:00', draw: drawForest },
-  { cat:'reizen', title:'Campervakantie Nederland – kosten', user:'budgettrip', views:'740K', dur:'2:20', draw: drawSky },
-  { cat:'reizen', title:'Beste streetfood in Bangkok', user:'wanderworld', views:'4,5M', dur:'1:40', draw: drawPizza },
-  { cat:'reizen', title:'Solo reizen als vrouw – veilig?', user:'soloqueens', views:'2,3M', dur:'3:15', draw: drawAmsterdam },
-];
+// Pour vous
+{ cat:'forjou', title:"Coucher de soleil dans les Alpes", user:'sophievdberg', views:'1,2M', dur:'0:58', draw: drawSunset },
+{ cat:'forjou', title:"Faire une pizza en 10 minutes", user:'tim.creates',  views:'890K',  dur:'1:14', draw: drawPizza },
+{ cat:'forjou', title:"Amsterdam la nuit", user:'noor.nl', views:'540K', dur:'0:42', draw: drawAmsterdam },
+{ cat:'forjou', title:"Recette cheesecake stroopwafel", user:'bakedbylisa', views:'2,1M', dur:'2:05', draw: drawCake },
+{ cat:'forjou', title:"Réserver des vols pas chers", user:'maxreizen', views:'330K', dur:'1:30', draw: drawSky },
+{ cat:'forjou', title:"Challenge danse 🔥", user:'dansfan99', views:'4,8M', dur:'0:33', draw: drawDance },
+
+// Tendances
+{ cat:'trending', title:"Astuce frites belges virale", user:'friet_king', views:'6,2M', dur:'0:45', draw: drawPizza },
+{ cat:'trending', title:"Ours polaire nage avec nous", user:'wildlens', views:'9,1M', dur:'1:02', draw: drawSky },
+{ cat:'trending', title:"Café à Gand – endroit caché", user:'wanderbe', views:'1,8M', dur:'0:55', draw: drawAmsterdam },
+{ cat:'trending', title:"Croissant parfait fait maison", user:'bakedbylisa', views:'3,3M', dur:'1:48', draw: drawCake },
+
+// Nature
+{ cat:'natuur', title:"Cascade en Norvège", user:'nordexplore', views:'2,4M', dur:'1:10', draw: drawSunset },
+{ cat:'natuur', title:"Chant des oiseaux dans les Ardennes", user:'naturebe', views:'780K', dur:'2:20', draw: drawSky },
+{ cat:'natuur', title:"Tortue marine en Grèce", user:'sea_tales', views:'1,1M', dur:'0:52', draw: drawAmsterdam },
+{ cat:'natuur', title:"Lever de soleil dans le Sahara", user:'desertvibes', views:'3,6M', dur:'1:05', draw: drawSunset },
+
+// Cuisine
+{ cat:'koken', title:"Carbonara comme à Rome", user:'pasta.papa', views:'5,5M', dur:'2:10', draw: drawPizza },
+{ cat:'koken', title:"Carbonnade flamande classique", user:'vlaamskoken', views:'890K', dur:'3:15', draw: drawCake },
+{ cat:'koken', title:"Smoothie bowl en 5 min", user:'healthnoor', views:'420K', dur:'0:58', draw: drawSky },
+
+// Danse
+{ cat:'dans', title:"Nouveau challenge – tu participes ?", user:'dansfan99', views:'7,3M', dur:'0:28', draw: drawDance },
+{ cat:'dans', title:"Tutoriel salsa pour débutants", user:'salsalife', views:'1,2M', dur:'4:00', draw: drawDance },
+{ cat:'dans', title:"Danse spontanée à Anvers", user:'streetsbe', views:'560K', dur:'0:44', draw: drawAmsterdam },
+
+// Voyage
+{ cat:'reizen', title:"24h à Lisbonne – que faire", user:'maxreizen', views:'2,0M', dur:'3:30', draw: drawSky },
+{ cat:'reizen', title:"Astuce auberges pas chères 2025", user:'budgettrip', views:'890K', dur:'1:55', draw: drawAmsterdam },
+{ cat:'reizen', title:"Maroc en 7 jours", user:'wanderworld', views:'1,4M', dur:'2:45', draw: drawSunset },
+
+// Sport
+{ cat:'sport', title:"Workout du matin – sans salle", user:'fitjelle', views:'3,1M', dur:'1:20', draw: drawDance },
+{ cat:'sport', title:"Nager dans l’eau glacée", user:'coldpoolnl', views:'4,7M', dur:'0:50', draw: drawSky },
+{ cat:'sport', title:"Vélo dans les Ardennes", user:'velobe', views:'670K', dur:'2:10', draw: drawSunset },
+{ cat:'sport', title:"Course 30 min débutants", user:'runwithme', views:'1,9M', dur:'2:35', draw: drawForest },
+{ cat:'sport', title:"Yoga sur la plage – routine matin", user:'yoganoor', views:'2,2M', dur:'3:10', draw: drawBeach },
+{ cat:'sport', title:"Musculation maison avec chaise", user:'fitjelle', views:'880K', dur:'1:45', draw: drawDance },
+{ cat:'sport', title:"Skate au centre de Rotterdam", user:'skate.nl', views:'1,3M', dur:'0:56', draw: drawAmsterdam },
+
+// Pour vous – extra
+{ cat:'forjou', title:"Chats trop drôles 😂", user:'catlovers.nl', views:'8,4M', dur:'0:22', draw: drawForest },
+{ cat:'forjou', title:"Visite tiny house à Utrecht", user:'kleinwonen', views:'1,6M', dur:'2:40', draw: drawAmsterdam },
+{ cat:'forjou', title:"10 choses à ne plus acheter", user:'spaargids', views:'3,0M', dur:'1:55', draw: drawSky },
+{ cat:'forjou', title:"Balade d’automne dans la Veluwe", user:'veluwewandel', views:'490K', dur:'1:12', draw: drawForest },
+
+// Tendances – extra
+{ cat:'trending', title:"Cette recette devient virale en NL", user:'kooktrend', views:'11,2M', dur:'1:00', draw: drawPizza },
+{ cat:'trending', title:"Ban TikTok – et maintenant ?", user:'techpraat', views:'5,7M', dur:'2:15', draw: drawSky },
+{ cat:'trending', title:"Plus belles plages d’Europe 2025", user:'beachlife', views:'4,1M', dur:'1:30', draw: drawBeach },
+{ cat:'trending', title:"Gagner de l’argent avec des apps ?", user:'moneycheck', views:'7,8M', dur:'1:10', draw: drawAmsterdam },
+
+// Nature – extra
+{ cat:'natuur', title:"Renards dans la neige – Suède", user:'nordic.wild', views:'5,2M', dur:'0:48', draw: drawForest },
+{ cat:'natuur', title:"Snorkeling récif corallien Croatie", user:'sea_tales', views:'2,9M', dur:'1:35', draw: drawBeach },
+{ cat:'natuur', title:"Orage au-dessus de la mer du Nord", user:'stormchaser.be', views:'3,4M', dur:'0:38', draw: drawSky },
+{ cat:'natuur', title:"Magnolias en fleurs – Gand", user:'naturebe', views:'670K', dur:'1:02', draw: drawForest },
+
+// Cuisine – extra
+{ cat:'koken', title:"Curry thaï en 20 minutes", user:'spicekitchen', views:'1,4M', dur:'2:30', draw: drawPizza },
+{ cat:'koken', title:"Faire du pain au levain maison", user:'bakedbylisa', views:'3,8M', dur:'4:20', draw: drawCake },
+{ cat:'koken', title:"Œufs brouillés parfaits comme Gordon", user:'chefvibes', views:'6,1M', dur:'0:55', draw: drawPizza },
+{ cat:'koken', title:"Recette vegan bitterballen", user:'veganbe', views:'920K', dur:'1:50', draw: drawCake },
+{ cat:'koken', title:"Paella BBQ – hit de l’été", user:'bbqking.nl', views:'2,5M', dur:'3:05', draw: drawBeach },
+
+// Danse – extra
+{ cat:'dans', title:"Tutoriel afrobeats – facile", user:'dancewithme', views:'2,8M', dur:'2:15', draw: drawDance },
+{ cat:'dans', title:"Répéter danse de mariage à la maison", user:'salsalife', views:'1,5M', dur:'3:40', draw: drawDance },
+{ cat:'dans', title:"Bases breakdance 2025", user:'b_boy_nl', views:'990K', dur:'1:58', draw: drawDance },
+
+// Voyage – extra
+{ cat:'reizen', title:"Week-end Barcelone – astuces", user:'maxreizen', views:'3,2M', dur:'2:50', draw: drawBeach },
+{ cat:'reizen', title:"Voyage en train en Scandinavie", user:'trainaddict', views:'1,1M', dur:'4:00', draw: drawForest },
+{ cat:'reizen', title:"Camping-car NL – budget", user:'budgettrip', views:'740K', dur:'2:20', draw: drawSky },
+{ cat:'reizen', title:"Meilleur street food à Bangkok", user:'wanderworld', views:'4,5M', dur:'1:40', draw: drawPizza },
+{ cat:'reizen', title:"Voyager seule – sécurité ?", user:'soloqueens', views:'2,3M', dur:'3:15', draw: drawAmsterdam },
 
 // ── Canvas draw functions ──────────────────────────────────────
 function drawSunset(c){
